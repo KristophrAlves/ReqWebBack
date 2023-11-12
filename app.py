@@ -31,7 +31,6 @@ def createUser():
         password = data['Senha']
         cursor = mysql.cursor()
 
-        # Verificar se o usuário já existe
         cursor.execute("SELECT id FROM usuario WHERE Email = %s", (email))
         existing_user = cursor.fetchone()
 
@@ -41,7 +40,6 @@ def createUser():
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        # Inserir um novo registro na tabela 'users'
         cursor.execute("INSERT INTO usuario (Nome, Email, Senha) VALUES (%s, %s, %s)", (username, email, hashed_password))
         mysql.commit()
 
@@ -80,11 +78,10 @@ def cadastro_veterinario():
         endereco = data['Endereco']
         cidade = data['Cidade']
         uf = data['Uf']
-        usuario_id = data['UsuarioID']  # Relacione este ID com o usuário que está logado
+        usuario_id = data['UsuarioID'] 
 
         cursor = mysql.cursor()
 
-        # Insira um novo veterinário na tabela 'veterinario'
         cursor.execute("INSERT INTO veterinario (Nome, Cpf, Crmv, UfCrmv, Email, NumeroHabilitacao, Telefone, Endereco, Cidade, Uf, UsuarioID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                        (nome, cpf, crmv, uf_crmv, email, numero_habilitacao, telefone, endereco, cidade, uf, usuario_id))
         mysql.commit()
@@ -100,14 +97,12 @@ def get_veterinarios_por_usuario(usuario_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter os veterinários associados a um usuário específico
         cursor.execute("SELECT * FROM veterinario WHERE UsuarioID = %s", (usuario_id,))
         veterinarios = cursor.fetchall()
 
         cursor.close()
 
         if veterinarios:
-            # Crie uma lista de dicionários com as informações dos veterinários
             veterinarios_info = []
             for veterinario in veterinarios:
                 veterinario_info = {
@@ -135,7 +130,6 @@ def get_veterinarios_por_usuario(usuario_id):
 def update_veterinario(veterinario_id):
     try:
         data = request.get_json()
-        # Certifique-se de que os campos obrigatórios sejam fornecidos na solicitação JSON
         required_fields = ["ID", 'Nome', 'Cpf', 'Crmv', 'UfCrmv', 'Email', 'NumeroHabilitacao', 'Telefone', 'Endereco', 'Cidade', 'Uf', 'UsuarioID']
         for field in required_fields:
             if field not in data:
@@ -143,7 +137,6 @@ def update_veterinario(veterinario_id):
 
         cursor = mysql.cursor()
 
-        # Atualize os dados do veterinário com base no ID
         cursor.execute("UPDATE veterinario SET Nome = %s, Cpf = %s, Crmv = %s, UfCrmv = %s, Email = %s, NumeroHabilitacao = %s, Telefone = %s, Endereco = %s, Cidade = %s, Uf = %s, UsuarioID = %s WHERE ID = %s",
                        (data['Nome'], data['Cpf'], data['Crmv'], data['UfCrmv'], data['Email'], data['NumeroHabilitacao'], data['Telefone'], data['Endereco'], data['Cidade'], data['Uf'], data['UsuarioID'], veterinario_id))
         mysql.commit()
@@ -159,14 +152,12 @@ def get_veterinario_por_id(veterinario_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter um veterinário específico com base no ID
         cursor.execute("SELECT * FROM veterinario WHERE ID = %s", (veterinario_id,))
         veterinario = cursor.fetchone()
 
         cursor.close()
 
         if veterinario:
-            # Crie um dicionário com as informações do veterinário
             veterinario_info = {
                 "ID": veterinario[0],
                 "Nome": veterinario[1],
@@ -192,7 +183,6 @@ def delete_veterinario(veterinario_id):
     try:
         cursor = mysql.cursor()
 
-        # Verifique se o veterinário com o ID fornecido existe
         cursor.execute("SELECT * FROM veterinario WHERE ID = %s", (veterinario_id,))
         veterinario = cursor.fetchone()
 
@@ -200,7 +190,6 @@ def delete_veterinario(veterinario_id):
             cursor.close()
             return jsonify({'message': 'Nenhum veterinário encontrado com o ID fornecido'}), 404
 
-        # Se o veterinário existe, execute a exclusão
         cursor.execute("DELETE FROM veterinario WHERE ID = %s", (veterinario_id,))
         mysql.commit()
         cursor.close()
@@ -215,17 +204,16 @@ def cadastro_proprietario():
         data = request.get_json()
         nome = data['Nome']
         cpf = data['Cpf']
-        cnpj = data['Cnpj']
+        cnpj = data['Cpf']
         endereco = data['Endereco']
         email = data['Email']
         telefone = data['Telefone']
         cidade = data['Cidade']
         uf = data['Uf']
-        usuario_id = data['UsuarioID']  # Relacione este ID com o usuário que está logado
+        usuario_id = data['UsuarioID'] 
 
         cursor = mysql.cursor()
 
-        # Insira um novo proprietário na tabela 'Proprietario'
         cursor.execute("INSERT INTO Proprietario (Nome, Cpf, Cnpj, Endereco, Email, Telefone, Cidade, Uf, UsuarioID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                        (nome, cpf, cnpj, endereco, email, telefone, cidade, uf, usuario_id))
         mysql.commit()
@@ -241,14 +229,12 @@ def get_proprietarios_por_usuario(usuario_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter os proprietários associados a um usuário específico
         cursor.execute("SELECT * FROM Proprietario WHERE UsuarioID = %s", (usuario_id,))
         proprietarios = cursor.fetchall()
 
         cursor.close()
 
         if proprietarios:
-            # Crie uma lista de dicionários com as informações dos proprietários
             proprietarios_info = []
             for proprietario in proprietarios:
                 proprietario_info = {
@@ -274,7 +260,7 @@ def get_proprietarios_por_usuario(usuario_id):
 def update_proprietario(proprietario_id):
     try:
         data = request.get_json()
-        # Certifique-se de que os campos obrigatórios sejam fornecidos na solicitação JSON
+
         required_fields = ["Nome", "Cpf", "Cnpj", "Endereco", "Email", "Telefone", "Cidade", "Uf", "UsuarioID"]
         for field in required_fields:
             if field not in data:
@@ -282,7 +268,6 @@ def update_proprietario(proprietario_id):
 
         cursor = mysql.cursor()
 
-        # Atualize os dados do proprietário com base no ID
         cursor.execute("UPDATE Proprietario SET Nome = %s, Cpf = %s, Cnpj = %s, Endereco = %s, Email = %s, Telefone = %s, Cidade = %s, Uf = %s, UsuarioID = %s WHERE ID = %s",
                        (data['Nome'], data['Cpf'], data['Cnpj'], data['Endereco'], data['Email'], data['Telefone'], data['Cidade'], data['Uf'], data['UsuarioID'], proprietario_id))
         mysql.commit()
@@ -298,14 +283,12 @@ def get_proprietario_por_id(proprietario_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter um proprietário específico com base no ID
         cursor.execute("SELECT * FROM Proprietario WHERE ID = %s", (proprietario_id,))
         proprietario = cursor.fetchone()
 
         cursor.close()
 
         if proprietario:
-            # Crie um dicionário com as informações do proprietário
             proprietario_info = {
                 "ID": proprietario[0],
                 "Nome": proprietario[1],
@@ -329,7 +312,6 @@ def delete_proprietario(proprietario_id):
     try:
         cursor = mysql.cursor()
 
-        # Verifique se o proprietário com o ID fornecido existe
         cursor.execute("SELECT * FROM Proprietario WHERE ID = %s", (proprietario_id))
         proprietario = cursor.fetchone()
 
@@ -337,7 +319,6 @@ def delete_proprietario(proprietario_id):
             cursor.close()
             return jsonify({'message': 'Nenhum proprietário encontrado com o ID fornecido'}), 404
 
-        # Se o proprietário existe, execute a exclusão
         cursor.execute("DELETE FROM Proprietario WHERE ID = %s", (proprietario_id))
         mysql.commit()
         cursor.close()
@@ -371,7 +352,6 @@ def cadastro_animal():
 
         cursor = mysql.cursor()
 
-        # Insira um novo animal na tabela 'Animal'
         cursor.execute("INSERT INTO Animal (Nome, RegistroMarca, Especie, Raca, Sexo, Gestacao, DataNascimento, Propriedade, Classificacao, NumeroCadastroPropriedade, Coordenadas, NumeroEquideos, Cidade, Uf, Pelagem, Descricao, ProprietarioID, UsuarioID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                        (nome, registro_marca, especie, raca, sexo, gestacao, data_nascimento, propriedade, classificacao, numero_cadastro_propriedade, coordenadas, numero_equideos, cidade, uf, pelagem, descricao, proprietario_id, usuario_id))
         mysql.commit()
@@ -387,14 +367,12 @@ def get_animais_por_usuario(usuario_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter os animais associados a um usuário específico
         cursor.execute("SELECT * FROM Animal WHERE UsuarioID = %s", (usuario_id,))
         animais = cursor.fetchall()
 
         cursor.close()
 
         if animais:
-            # Crie uma lista de dicionários com as informações dos animais
             animais_info = []
             for animal in animais:
                 animal_info = {
@@ -429,15 +407,14 @@ def get_animais_por_usuario(usuario_id):
 def update_animal(animal_id):
     try:
         data = request.get_json()
-        # Certifique-se de que os campos obrigatórios sejam fornecidos na solicitação JSON
+
         required_fields = ["ID", "Nome", "RegistroMarca", "Especie", "Raca", "Sexo", "Gestacao", "DataNascimento", "Propriedade", "Classificacao", "NumeroCadastroPropriedade", "Coordenadas", "NumeroEquideos", "Cidade", "Uf", "Pelagem", "Descricao", "ProprietarioID", "UsuarioID"]
         for field in required_fields:
             if field not in data:
-                return jsonify({'message': f'O campo obrigatório {field} está faltando'}), 400
+                return jsonify({'message': 'O campo obrigatório {field} está faltando'}), 400
 
         cursor = mysql.cursor()
 
-        # Atualize os dados do animal com base no ID
         cursor.execute("UPDATE Animal SET Nome = %s, RegistroMarca = %s, Especie = %s, Raca = %s, Sexo = %s, Gestacao = %s, DataNascimento = %s, Propriedade = %s, Classificacao = %s, NumeroCadastroPropriedade = %s, Coordenadas = %s, NumeroEquideos = %s, Cidade = %s, Uf = %s, Pelagem = %s, Descricao = %s, ProprietarioID = %s, UsuarioID = %s WHERE ID = %s",
                        (data['Nome'], data['RegistroMarca'], data['Especie'], data['Raca'], data['Sexo'], data['Gestacao'], data['DataNascimento'], data['Propriedade'], data['Classificacao'], data['NumeroCadastroPropriedade'], data['Coordenadas'], data['NumeroEquideos'], data['Cidade'], data['Uf'], data['Pelagem'], data['Descricao'], data['ProprietarioID'], data['UsuarioID'], animal_id))
         mysql.commit()
@@ -453,14 +430,12 @@ def get_animal_por_id(animal_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter um animal específico com base no ID
         cursor.execute("SELECT * FROM Animal WHERE ID = %s", (animal_id,))
         animal = cursor.fetchone()
 
         cursor.close()
 
         if animal:
-            # Crie um dicionário com as informações do animal
             animal_info = {
                 "ID": animal[0],
                 "Nome": animal[1],
@@ -493,7 +468,6 @@ def delete_animal(animal_id):
     try:
         cursor = mysql.cursor()
 
-        # Verifique se o animal com o ID fornecido existe
         cursor.execute("SELECT * FROM Animal WHERE ID = %s", (animal_id,))
         animal = cursor.fetchone()
 
@@ -501,7 +475,6 @@ def delete_animal(animal_id):
             cursor.close()
             return jsonify({'message': 'Nenhum animal encontrado com o ID fornecido'}), 404
 
-        # Se o animal existe, execute a exclusão
         cursor.execute("DELETE FROM Animal WHERE ID = %s", (animal_id,))
         mysql.commit()
         cursor.close()
@@ -525,7 +498,6 @@ def cadastro_exame():
 
         cursor = mysql.cursor()
 
-        # Insira um novo exame na tabela 'Exame'
         cursor.execute("INSERT INTO Exame (Serie, Numero, Metodo, Finalidade, DataExame, VeterinarioID, AnimalID, UsuarioID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                        (serie, numero, metodo, finalidade, data_exame, veterinario_id, animal_id, usuario_id))
         mysql.commit()
@@ -540,7 +512,6 @@ def get_exames_por_usuario(usuario_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter todos os exames associados a um usuário específico
         cursor.execute("SELECT * FROM Exame WHERE UsuarioID = %s", (usuario_id,))
         exames = cursor.fetchall()
 
@@ -582,7 +553,6 @@ def update_exame(exame_id):
 
         cursor = mysql.cursor()
 
-        # Atualize os dados do exame com base no ID
         cursor.execute("UPDATE Exame SET Serie = %s, Numero = %s, Metodo = %s, Finalidade = %s, DataExame = %s, VeterinarioID = %s, AnimalID = %s, UsuarioID = %s WHERE ID = %s",
                        (serie, numero, metodo, finalidade, data_exame, veterinario_id, animal_id, usuario_id, exame_id))
         mysql.commit()
@@ -597,8 +567,7 @@ def update_exame(exame_id):
 def get_exame_por_id(exame_id):
     try:
         cursor = mysql.cursor()
-        
-        # Realize uma consulta para obter um exame específico com base no ID
+
         cursor.execute("SELECT * FROM Exame WHERE ID = %s", (exame_id,))
         exame = cursor.fetchone()
 
@@ -627,7 +596,6 @@ def delete_exame(exame_id):
     try:
         cursor = mysql.cursor()
 
-        # Verifique se o exame com o ID fornecido existe
         cursor.execute("SELECT * FROM Exame WHERE ID = %s", (exame_id,))
         exame = cursor.fetchone()
 
@@ -635,7 +603,6 @@ def delete_exame(exame_id):
             cursor.close()
             return jsonify({'message': 'Nenhum exame encontrado com o ID fornecido'}), 404
 
-        # Se o exame existe, execute a exclusão
         cursor.execute("DELETE FROM Exame WHERE ID = %s", (exame_id,))
         mysql.commit()
         cursor.close()
@@ -649,23 +616,19 @@ def get_exame_completo(exame_id):
     try:
         cursor = mysql.cursor()
 
-        # Realize uma consulta para obter as informações do exame com base no ID
-        cursor.execute("SELECT * FROM Exame WHERE ID = %s", (exame_id,))
+        cursor.execute("SELECT * FROM Exame WHERE ID = %s", (exame_id))
         exame = cursor.fetchone()
 
         if not exame:
             cursor.close()
             return jsonify({'message': 'Nenhum exame encontrado com o ID fornecido'}), 404
 
-        # Obtenha as informações do proprietário com base no ProprietarioID do animal associado ao exame
         cursor.execute("SELECT * FROM Proprietario WHERE ID = (SELECT ProprietarioID FROM Animal WHERE ID = %s)", (exame[7],))
         proprietario = cursor.fetchone()
 
-        # Obtenha as informações do veterinário com base no VeterinarioID do exame
         cursor.execute("SELECT * FROM Veterinario WHERE ID = %s", (exame[6],))
         veterinario = cursor.fetchone()
 
-        # Obtenha as informações do animal com base no AnimalID do exame
         cursor.execute("SELECT * FROM Animal WHERE ID = %s", (exame[7],))
         animal = cursor.fetchone()
 
@@ -674,60 +637,60 @@ def get_exame_completo(exame_id):
         if exame and proprietario and veterinario and animal:
             exame_info = {
                 "Exame": {
-                    "ID": exame[0],
-                    "Serie": exame[1],
-                    "Numero": exame[2],
-                    "Metodo": exame[3],
-                    "Finalidade": exame[4],
-                    "DataExame": exame[5].strftime('%Y-%m-%d'),
-                    "VeterinarioID": exame[6],
-                    "AnimalID": exame[7],
-                    "UsuarioID": exame[8]
+                    "ID": exame[0] or '',
+                    "Serie": exame[1] or '' ,
+                    "Numero": exame[2] or '' ,
+                    "Metodo": exame[3] or '' ,
+                    "Finalidade": exame[4] or '' ,
+                    "DataExame": exame[5].strftime('%Y-%m-%d') or '',
+                    "VeterinarioID": exame[6] or '',
+                    "AnimalID": exame[7] or '',
+                    "UsuarioID": exame[8] or ''
                 },
                 "Proprietario": {
-                    "ID": proprietario[0],
-                    "Nome": proprietario[1],
-                    "CPF": proprietario[2],
-                    "CNPJ": proprietario[3],
-                    "Endereco": proprietario[4],
-                    "Email": proprietario[5],
-                    "Telefone": proprietario[6],
-                    "Cidade": proprietario[7],
-                    "Uf": proprietario[8]
+                    "ID": proprietario[0] or '',
+                    "Nome": proprietario[1] or '',
+                    "CPF": proprietario[2] or '',
+                    "CNPJ": proprietario[3] or '',
+                    "Endereco": proprietario[4] or '',
+                    "Email": proprietario[5] or '',
+                    "Telefone": proprietario[6] or '',
+                    "Cidade": proprietario[7] or '',
+                    "Uf": proprietario[8] or ''
                 },
                 "Veterinario": {
-                    "ID": veterinario[0],
-                    "Nome": veterinario[1],
-                    "Cpf": veterinario[2],
-                    "Crmv": veterinario[3],
-                    "UfCrmv": veterinario[4],
-                    "Email": veterinario[5],
-                    "NumeroHabilitacao": veterinario[6],
-                    "Telefone": veterinario[7],
-                    "Endereco": veterinario[8],
-                    "Cidade": veterinario[9],
-                    "Uf": veterinario[10]
+                    "ID": veterinario[0] or '',
+                    "Nome": veterinario[1] or '',
+                    "Cpf": veterinario[2] or '',
+                    "Crmv": veterinario[3] or '',
+                    "UfCrmv": veterinario[4] or '',
+                    "Email": veterinario[5] or '',
+                    "NumeroHabilitacao": veterinario[6] or '',
+                    "Telefone": veterinario[7] or '',
+                    "Endereco": veterinario[8] or '',
+                    "Cidade": veterinario[9] or '',
+                    "Uf": veterinario[10] or ''
                 },
                 "Animal": {
-                    "ID": animal[0],
-                    "Nome": animal[1],
-                    "RegistroMarca": animal[2],
-                    "Especie": animal[3],
-                    "Raca": animal[4],
-                    "Sexo": animal[5],
-                    "Gestacao": animal[6],
-                    "DataNascimento": animal[7].strftime('%Y-%m-%d'),
-                    "Propriedade": animal[8],
-                    "Classificacao": animal[9],
-                    "NumeroCadastroPropriedade": animal[10],
-                    "Coordenadas": animal[11],
-                    "NumeroEquideos": animal[12],
-                    "Cidade": animal[13],
-                    "Uf": animal[14],
-                    "Pelagem": animal[15],
-                    "Descricao": animal[16],
-                    "ProprietarioID": animal[17],
-                    "UsuarioID": animal[18]
+                    "ID": animal[0] or '',
+                    "Nome": animal[1] or '',
+                    "RegistroMarca": animal[2] or '',
+                    "Especie": animal[3] or '',
+                    "Raca": animal[4] or '',
+                    "Sexo": animal[5] or '',
+                    "Gestacao": animal[6] or '',
+                    "DataNascimento": animal[7].strftime('%Y-%m-%d') or '',
+                    "Propriedade": animal[8] or '',
+                    "Classificacao": animal[9] or '',
+                    "NumeroCadastroPropriedade": animal[10] or '',
+                    "Coordenadas": animal[11] or '',
+                    "NumeroEquideos": animal[12] or '',
+                    "Cidade": animal[13] or '',
+                    "Uf": animal[14] or '',
+                    "Pelagem": animal[15] or '',
+                    "Descricao": animal[16] or '',
+                    "ProprietarioID": animal[17] or '',
+                    "UsuarioID": animal[18] or ''
                 }
             }
 
